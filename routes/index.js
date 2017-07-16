@@ -5,6 +5,18 @@ const crypto = require('crypto');
 const models = require('../models')
 let creators = [];
 
+const getSnippet = function (req, res, next) {
+  models.snippets.findById(req.params.snippetId).then(function(snippet){
+    if(snippet) {
+      req.snippet = snippet;
+      console.log(req.snippet);
+      next();
+    } else {
+      res.status(404).send("Not Found");
+    }
+  })
+}
+
 var config = {
     salt: function(length){
     return crypto.randomBytes(Math.ceil(32 * 3 / 4)).toString('base64').slice(0, length);
@@ -27,8 +39,8 @@ function hashPassword(passwordinput){
 
 function isPasswordCorrect(data) {
 
-    console.log('these are the iterations: ', data.iterations);
-    var hash = crypto.pbkdf2Sync(data.attempt, data.password, data.salt, data.iterations, config.keylen, config.digest);
+    // console.log('these are the iterations: ', data.iterations);
+    var hash = crypto.pbkdf2Sync(data.attempt, data.salt, data.iterations, config.keylen, config.digest);
     var hashedPassword = hash.toString('base64');
 
     return data.password === hashedPassword;
@@ -39,26 +51,44 @@ router.get('/login', function(req, res) {
 });
 
 router.post('/login', function(req, res){
-  models.users.findOne({
-    where: {
-      username: req.body.username
+  req.checkBody('username', 'You must enter a username').notEmpty();
+  req.checkBody('password', 'You must enter a password').notEmpty();
+
+  req.getValidationResult().then(function(result){
+  if(result.isEmpty()){
+    models.users.findOne({
+      where: {
+        username: req.body.username
+      }
+    }).then(function(user){
+      if (user){
+        // console.log("we in there");
+        let data = {
+          password: user.password,
+          salt: user.salt,
+          attempt: req.body.password,
+          iterations: user.iterations
+        }
+        // console.log('do we get here');
+        if(isPasswordCorrect(data)) {
+          req.session.username = user.username;
+          req.session.userId = user.id;
+          res.redirect('/home');
+        } else {
+          let noMatch = {
+            message: "This username or password does not exist"
+          }
+          res.render('index', {noMatch: noMatch})
+        }
     }
-  }).then(function(user){
-    // if (user){
-      console.log("we in there");
-      let data = {
-        password: user.password,
-        salt: user.salt,
-        attempt: req.body.password,
-        iterations: user.iterations
-      }
-      console.log('do we get here');
-      if(isPasswordCorrect(data)) {
-        console.log('do we get into check pw');
-        res.redirect('/');
-      }
-  // }
-  })
+    })
+  } else {
+    const errors = result.mapped();
+
+    res.render('index', {errors: errors})
+  }
+
+})
 });
 
 router.get('/signup', function(req, res){
@@ -67,9 +97,9 @@ router.get('/signup', function(req, res){
 
 router.post('/signup', function(req, res){
   let userData = hashPassword(req.body.password);
-  console.log(userData.hash);
-  console.log(req.body.password);
-  console.log(userData);
+  // console.log(userData.hash);
+  // console.log(req.body.password);
+  // console.log(userData);
   userData.username = req.body.username;
 
   models.users.create(userData).then(res.redirect('/login'));
@@ -97,12 +127,14 @@ router.get('/home', function(req, res){
         tags: snippet.tags,
         stars: snippet.stars,
         createdAt: snippet.createdAt,
+        id: snippet.id
 
       }
       creators.push(snippetCreator);
-      console.log(creators);
+      // console.log(creators);
     })
-    res.render('home', {snippets: creators})
+
+    res.render('home', {snippets: creators, username: req.session.username})
   })
 
 })
@@ -120,13 +152,201 @@ router.post('/create-snippet', function(req, res){
     notes: req.body.notes,
     language: req.body.language,
     tags: req.body.tags.split(" "),
-    userId: 1
+    userId: req.session.userId
   }
 
   models.snippets.create(newSnippet).then(function(){
     res.redirect('/home');
   })
 });
+
+router.post('/home/:snippetId/delete', getSnippet, function(req, res){
+  req.snippet.destroy().then(function() {
+    res.redirect("/home");
+  });
+  // res.redirect('/:snippetId/snippet')
+});
+
+router.post('/snippet/:snippetId', getSnippet, function(req, res){
+  console.log(req.params.snippetId);
+  models.snippets.findOne({
+    where: {
+      id: req.params.snippetId
+    },
+    include: [{
+      model: models.users,
+      as: 'users'
+    }]
+  }).then(function(snippet){
+    res.render('snippet', {snippet: snippet});
+  })
+});
+
+// router.get('/snippets/javascript', function(req, res){
+//   creators = [];
+//   models.snippets.findAll({
+//     where: {
+//       language: "javascript"
+//     },
+//     include: [{
+//       model: models.users,
+//       as: 'users'
+//     }]
+//   }).then(function(snippets){
+//     snippets.forEach(function(snippet){
+//       snippetCreator = {
+//         snippetUser: snippet.users.dataValues.username,
+//         title: snippet.title,
+//         body: snippet.body,
+//         notes: snippet.notes,
+//         language: snippet.language,
+//         tags: snippet.tags,
+//         stars: snippet.stars,
+//         createdAt: snippet.createdAt,
+//         id: snippet.id
+//
+//       }
+//       creators.push(snippetCreator);
+//     })
+//     res.render('javascript-snippets', {snippets: creators})
+//   })
+// });
+
+// router.get('/snippets/java', function(req, res){
+//   creators = [];
+//   models.snippets.findAll({
+//     where: {
+//       language: "java"
+//     },
+//     include: [{
+//       model: models.users,
+//       as: 'users'
+//     }]
+//   }).then(function(snippets){
+//     snippets.forEach(function(snippet){
+//       snippetCreator = {
+//         snippetUser: snippet.users.dataValues.username,
+//         title: snippet.title,
+//         body: snippet.body,
+//         notes: snippet.notes,
+//         language: snippet.language,
+//         tags: snippet.tags,
+//         stars: snippet.stars,
+//         createdAt: snippet.createdAt,
+//         id: snippet.id
+//
+//       }
+//       creators.push(snippetCreator);
+//     })
+//     res.render('java-snippets', {snippets: creators})
+//   })
+// })
+
+// router.get('/snippets/ruby', function(req, res){
+//   creators = [];
+//   models.snippets.findAll({
+//     where: {
+//       language: "ruby"
+//     },
+//     include: [{
+//       model: models.users,
+//       as: 'users'
+//     }]
+//   }).then(function(snippets){
+//     snippets.forEach(function(snippet){
+//       snippetCreator = {
+//         snippetUser: snippet.users.dataValues.username,
+//         title: snippet.title,
+//         body: snippet.body,
+//         notes: snippet.notes,
+//         language: snippet.language,
+//         tags: snippet.tags,
+//         stars: snippet.stars,
+//         createdAt: snippet.createdAt,
+//         id: snippet.id
+//
+//       }
+//       creators.push(snippetCreator);
+//     })
+//     res.render('ruby-snippets', {snippets: creators})
+//   })
+// });
+
+router.post('/language-search', function(req, res){
+  creators = [];
+  models.snippets.findAll({
+    where: {
+      language: req.body.language
+    },
+    include: [{
+      model: models.users,
+      as: 'users'
+    }]
+  }).then(function(snippets){
+    snippets.forEach(function(snippet){
+      snippetCreator = {
+        snippetUser: snippet.users.dataValues.username,
+        title: snippet.title,
+        body: snippet.body,
+        notes: snippet.notes,
+        language: snippet.language,
+        tags: snippet.tags,
+        stars: snippet.stars,
+        createdAt: snippet.createdAt,
+        id: snippet.id
+
+      }
+      creators.push(snippetCreator);
+    })
+    res.render('language-search', {snippets: creators})
+  })
+})
+
+router.post('/tag-search', function(req, res){
+  creators = [];
+  console.log(creators);
+  models.snippets.findAll({
+    where: {
+      tags: req.body.tag.split(" ")
+    },
+    include: [{
+      model: models.users,
+      as: 'users'
+    }]
+  }).then(function(snippets){
+    snippets.forEach(function(snippet){
+      snippetCreator = {
+        snippetUser: snippet.users.dataValues.username,
+        title: snippet.title,
+        body: snippet.body,
+        notes: snippet.notes,
+        language: snippet.language,
+        tags: snippet.tags,
+        stars: snippet.stars,
+        createdAt: snippet.createdAt,
+        id: snippet.id
+
+      }
+      creators.push(snippetCreator);
+    })
+    res.render('tag-search', {snippets: creators})
+  })
+})
+
+// router.get('/snippet/:snippetId', getSnippet, function(req, res){
+//   models.snippets.findOne({
+//     where: {
+//       id: req.params.snippetId
+//     },
+//     include: [{
+//       model: models.users,
+//       as: 'users'
+//     }]
+//   }).then(function(snippet){
+//     res.render('snippet', {snippet: snippet});
+//   })
+//
+// });
 
 
 

@@ -1,4 +1,14 @@
 <div class="login">
+  <h3>Please Login With Your Username and Password</h3>
+  {{#errors.username}}
+  <p>{{msg}}</p>
+  {{/errors.username}}
+  {{#errors.password}}
+  <p>{{msg}}</p>
+  {{/errors.password}}
+  {{#noMatch}}
+  <p>{{message}}</p>
+  {{/noMatch}}
   <form action="/login" method="post">
     <label for="username">Username</label>
     <input id="username" type="text" name="username" placeholder="username">

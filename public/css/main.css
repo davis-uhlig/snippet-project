@@ -8,3 +8,12 @@
   background-color: teal;
   padding: 3vw;
 }
+
+.nav-titles {
+  display: flex;
+}
+
+.nav-links {
+  margin-top: 10px;
+  margin-right: 20px;
+}

@@ -1,7 +1,40 @@
 <div class="hi">
 
+  <!-- <form class="" action="index.html" method="post">
+    <select  name="select">
+      <option value="all">View All Snippets</option>
+      <option value="javascript">View Javascript Snippets</option>
+      <option value="java">View Java Snippets</option>
+      <option value="ruby">View Ruby Snippets</option>
+    </select>
+  </form> -->
+  <h2>Welcome {{username}}</h2>
+  <nav class="main-nav">
+    <div class="nav-titles">
+      <h4 class="nav-links"><a href="/home">View All Snippets</a></h4>
+      <h4><a href="/my-snippets">View My Snippets</a></h4>
+      <h4 class="nav-links"><a href="/create-snippet">Create A Snippet</a></h4>
+      <h4 class="nav-links"><a href="/snippets/javascript">View Javascript Snippets</a></h4>
+      <h4 class="nav-links"><a href="/snippets/java">View Java Snippets</a></h4>
+      <h4 class="nav-links"><a href="/snippets/ruby">View Ruby Snippets</a></h4>
+      <!-- <h4 class="nav-links">Logged In As {{username}}</h4> -->
+    </div>
+  </nav>
+  <div class="tag-search">
+    <form action="/tag-search" method="post">
+      <label for="tag">Search for a specific tag</label>
+      <input id="tag" type="text" name="tag" placeholder="tag">
+      <button type="submit" name="button">Submit</button>
+    </form>
+  </div>
 
-
+  <div class="language-search">
+    <form action="/language-search" method="post">
+      <label for="language">Search for a specific language</label>
+      <input id="language" type="text" name="language" placeholder="language">
+      <button type="submit" name="button">Submit</button>
+    </form>
+  </div>
 
     {{#snippets}}
     <div class="snippet-list">
@@ -13,6 +46,12 @@
     <p>stars: {{stars}}</p>
     <p>{{createdAt}}</p>
     </div>
+    <form action="/home/{{id}}/delete" method="post">
+      <button type="submit" name="button">Delete</button>
+    </form>
+    <form action="/snippet/{{id}}" method="post">
+      <button type="submit" name="button">go to this snippet</button>
+    </form>
     {{/snippets}}
 
 
