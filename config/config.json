@@ -1,20 +1,20 @@
 {
   "development": {
-    "username": "IsaacHardy",
+    "username": "duhlig",
     "password": null,
-    "database": "",
+    "database": "codeSnippets",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "test": {
-    "username": "IsaacHardy",
+    "username": "duhlig",
     "password": null,
-    "database": "",
+    "database": "codeSnippets",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "production": {
-    "username": "IsaacHardy",
+    "username": "duhlig",
     "password": null,
     "use_env_variable": "DATABASE_URL",
     "database": "DATABASE_URL",
