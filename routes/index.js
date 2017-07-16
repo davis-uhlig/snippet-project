@@ -38,37 +38,6 @@ router.get('/login', function(req, res) {
   res.render('index');
 });
 
-router.get('/home', function(req, res){
-  creators = [];
-
-  models.snippets.findAll({
-    order: [['createdAt', 'DESC']],
-    include: [{
-      model: models.users,
-      as: 'users'
-    }]
-  }).then(function(snippets){
-    // console.log(snippets);
-    snippets.forEach(function(snippet){
-      snippetCreator = {
-        snippetUser: snippet.users.dataValues.username,
-        title: snippet.title,
-        body: snippet.body,
-        notes: snippet.notes,
-        language: snippet.language,
-        tags: snippet.tags,
-        stars: snippet.stars,
-        createdAt: snippet.createdAt,
-
-      }
-      creators.push(snippetCreator);
-      console.log(creators);
-    })
-    res.render('home', {snippets: creators})
-  })
-
-})
-
 router.post('/login', function(req, res){
   models.users.findOne({
     where: {
@@ -102,18 +71,43 @@ router.post('/signup', function(req, res){
   console.log(req.body.password);
   console.log(userData);
   userData.username = req.body.username;
-  // let newperson = {
-  //   username:req.body.username,
-  //   password:userData
-  // }
-  // const userData = {
-  //   username: req.body.username,
-  //   password: ,
-  //   // salt:
-  // }
+
   models.users.create(userData).then(res.redirect('/login'));
 
 });
+
+router.get('/home', function(req, res){
+  creators = [];
+
+  models.snippets.findAll({
+    order: [['createdAt', 'DESC']],
+    include: [{
+      model: models.users,
+      as: 'users'
+    }]
+  }).then(function(snippets){
+    // console.log(snippets);
+    snippets.forEach(function(snippet){
+      snippetCreator = {
+        snippetUser: snippet.users.dataValues.username,
+        title: snippet.title,
+        body: snippet.body,
+        notes: snippet.notes,
+        language: snippet.language,
+        tags: snippet.tags,
+        stars: snippet.stars,
+        createdAt: snippet.createdAt,
+
+      }
+      creators.push(snippetCreator);
+      console.log(creators);
+    })
+    res.render('home', {snippets: creators})
+  })
+
+})
+
+
 
 router.get('/create-snippet', function(req, res){
   res.render('create-snippet')
