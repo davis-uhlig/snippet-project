@@ -17,3 +17,32 @@
   margin-top: 10px;
   margin-right: 20px;
 }
+
+#user-button {
+  border: none;
+  background-color: teal;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.nav-titles {
+  margin: 10px;
+}
+
+.tag-search {
+  margin-bottom: 10px;
+}
+
+.language-search {
+  margin-bottom: 20px;
+}
+
+.this-snippet {
+  margin-bottom: 20px;
+}
+
+.snippet-list {
+  margin-top: 20px;
+  
+}

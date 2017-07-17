@@ -1,4 +1,12 @@
 <div class="create-snippet">
+  <nav class="main-nav">
+    <div class="nav-titles">
+      <h4 class="nav-links"><a href="/home">View All Snippets</a></h4>
+      <h4 class="nav-links"><a href="/my-snippets">View My Snippets</a></h4>
+      <h4 class="nav-links"><a href="/create-snippet">Create A Snippet</a></h4>
+      <!-- <h4 class="nav-links">Logged In As {{username}}</h4> -->
+    </div>
+  </nav>
   <form action="/create-snippet" method="post">
     <input type="text" name="title" placeholder="title">
     <textarea name="body" placeholder="body"></textarea>

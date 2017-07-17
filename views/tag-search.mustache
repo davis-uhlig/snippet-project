@@ -1,13 +1,21 @@
 <div class="">
+  <nav class="main-nav">
+    <div class="nav-titles">
+      <h4 class="nav-links"><a href="/home">View All Snippets</a></h4>
+      <h4 class="nav-links"><a href="/my-snippets">View My Snippets</a></h4>
+      <h4 class="nav-links"><a href="/create-snippet">Create A Snippet</a></h4>
+      <!-- <h4 class="nav-links">Logged In As {{username}}</h4> -->
+    </div>
+  </nav>
   {{#snippets}}
   <div class="snippet-list">
-  <p>{{snippetUser}}</p>
-  <p>{{title}} ({{language}})</p>
-  <p>{{body}}</p>
-  <p>{{notes}}</p>
-  <p>{{tags}}</p>
-  <p>stars: {{stars}}</p>
-  <p>{{createdAt}}</p>
+    <p>creator: <strong>{{snippetUser}}</strong></p>
+    <p>title: {{title}} ({{language}})</p>
+    <p>body: {{body}}</p>
+    <p>notes: {{notes}}</p>
+    <p>tags: {{tags}}</p>
+    <p>stars: {{stars}}</p>
+    <p>{{createdAt}}</p>
   </div>
   {{/snippets}}
 </div>

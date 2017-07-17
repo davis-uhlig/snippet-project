@@ -1,4 +1,4 @@
-<div class="hi">
+<div>
 
   <!-- <form class="" action="index.html" method="post">
     <select  name="select">
@@ -12,11 +12,8 @@
   <nav class="main-nav">
     <div class="nav-titles">
       <h4 class="nav-links"><a href="/home">View All Snippets</a></h4>
-      <h4><a href="/my-snippets">View My Snippets</a></h4>
+      <h4 class="nav-links"><a href="/my-snippets">View My Snippets</a></h4>
       <h4 class="nav-links"><a href="/create-snippet">Create A Snippet</a></h4>
-      <h4 class="nav-links"><a href="/snippets/javascript">View Javascript Snippets</a></h4>
-      <h4 class="nav-links"><a href="/snippets/java">View Java Snippets</a></h4>
-      <h4 class="nav-links"><a href="/snippets/ruby">View Ruby Snippets</a></h4>
       <!-- <h4 class="nav-links">Logged In As {{username}}</h4> -->
     </div>
   </nav>
@@ -38,18 +35,21 @@
 
     {{#snippets}}
     <div class="snippet-list">
-    <p>{{snippetUser}}</p>
-    <p>{{title}} ({{language}})</p>
-    <p>{{body}}</p>
-    <p>{{notes}}</p>
-    <p>{{tags}}</p>
+      <form class="" action="/user-page/{{userId}}" method="post">
+        <button id="user-button" type="submit" name="button">creator: <strong>{{snippetUser}}</strong></button>
+      </form>
+    <!-- <p>{{snippetUser}}</p> -->
+    <p>title: {{title}} ({{language}})</p>
+    <p>body: {{body}}</p>
+    <p>notes: {{notes}}</p>
+    <p>tags: {{tags}}</p>
     <p>stars: {{stars}}</p>
     <p>{{createdAt}}</p>
     </div>
-    <form action="/home/{{id}}/delete" method="post">
+    <!-- <form action="/home/{{id}}/delete" method="post">
       <button type="submit" name="button">Delete</button>
-    </form>
-    <form action="/snippet/{{id}}" method="post">
+    </form> -->
+    <form class="this-snippet" action="/snippet/{{id}}" method="post">
       <button type="submit" name="button">go to this snippet</button>
     </form>
     {{/snippets}}
